@@ -1,4 +1,4 @@
-from microbit import *
+from microbit import running_time, display
 
 millis_in_second = 1000
 seconds_in_minute = 60
@@ -10,7 +10,7 @@ class IntervalTimer:
         # intervals in hours
         self.intervals = [1, 2, 4, 8, 16, 24]
         self.current_interval_index = 0
-        self.interval = 10000
+        self.interval = self.hours_to_millis(self.intervals[self.current_interval_index])
 
     def hours_to_millis(self, hour) -> int:
         return hour * minute_in_hour * seconds_in_minute * millis_in_second
