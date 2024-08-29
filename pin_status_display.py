@@ -43,9 +43,9 @@ class PinStatusDisplay:
     }
 
     @staticmethod
-    def display_pin_status(pin, status):
+    def display(pin: int, status: int, delay: int = 800) -> None:
         """
         Displays the Pin number with an arrow up if the status is on and down if the status is off
         """
-        display.show([PinStatusDisplay.pins_display[pin], PinStatusDisplay.pins_status[status]] * 2, delay=800)
+        display.show([PinStatusDisplay.pins_display[pin], PinStatusDisplay.pins_status[status]] * 2, delay=delay)
         display.clear()
