@@ -30,4 +30,4 @@ class IntervalTimer:
     def change_interval(self):
         self.current_interval_index = (self.current_interval_index + 1) % len(self.intervals)
         self.interval = self.hours_to_millis(self.intervals[self.current_interval_index])
-        display.scroll("Interval: {} Hour(s)".format(str(self.millis_to_hours(self.interval))))
+        display.scroll("{} hr".format(str(self.millis_to_hours(self.interval))))
