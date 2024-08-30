@@ -3,35 +3,32 @@ from status_display import StatusDisplay
 from interval_timer import IntervalTimer
 
 class Power:
-    off = 0
-    on = 1
+    OFF = 0
+    ON = 1
 
 class Mode:
-    power = 0
-    settings = 1
+    SETTINGS = 0
+    POWER = 1
 
 class MicrobitPinController:
     def __init__(self):
-        self.pins = [pin0, pin1, pin2]
         self.timer = IntervalTimer()
         self._pin = None
+        self.pins = [pin0, pin1, pin2]
         self.set_pin_on(self.pins[0])
-
-        self.is_mode_change_pressed = button_a.is_pressed() and button_b.is_pressed()
-        self.is_change_interval_pressed = self.mode == Mode.settings and button_b.is_pressed()
 
     def toggle_mode(self) -> None:
         self.mode = not self.mode
-        if self.mode == Mode.settings:
+        if self.mode == Mode.SETTINGS:
             StatusDisplay.display_settings()
 
     def set_pin_on(self, pin) -> None:
-        if self._pin == pin or pin.read_digital() == Power.on:
+        if self._pin == pin or pin.read_digital() == Power.ON:
             return
-
+        
         self._pin = pin
-        self.mode = Mode.power
-        self.write_pin(self._pin, Power.on)
+        self.mode = Mode.POWER
+        self.write_pin(self._pin, Power.ON)
 
     def update_interval_timer(self):
         self.timer.change_interval()
@@ -41,11 +38,19 @@ class MicrobitPinController:
         if self.timer.get_remaining_time() <= 0:
             self.toggle_pin_power()
             self.timer.reset()
+        
+    def is_timer_expired(self) -> bool:
+        return self.timer.get_remaining_time() <= 0
+    
+    def timer_expired_handler(self) -> None:
+        self.toggle_pin_power()
+        self.timer.reset()
 
     def toggle_pin_power(self):
-        current_power = self._pin.read_digital()
-        self.power_status = not current_power
-        self.write_pin(self._pin, self.power_status)
+        current_power = not int(self._pin.read_digital())
+        # self.power_status = (int(current_power) + 1) % 2
+        # display.show([str(current_power)], delay=800, clear=True)
+        # self.write_pin(self._pin, self.power_status)
 
     def write_pin(self, pin, status: int) -> None:
         self.power_status = status
@@ -55,5 +60,5 @@ class MicrobitPinController:
 
     def reset_pins(self):
         for pin in self.pins:
-            if pin.read_digital() == Power.on:
-                self.write_pin(pin, Power.off)
+            if pin.read_digital() == Power.ON:
+                self.write_pin(pin, Power.OFF)
