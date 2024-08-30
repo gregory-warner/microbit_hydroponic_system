@@ -1,4 +1,4 @@
-from microbit import *
+from microbit import Image, display
 
 class StatusDisplay:
     status = {
@@ -7,17 +7,17 @@ class StatusDisplay:
     }
 
     settings_image = Image(
-            "00900:"
-            "09990:"
-            "99099:"
-            "09990:"
-            "00900"
-        )
+        "09000:"
+        "99000:"
+        "00900:"
+        "00099:"
+        "00099"
+    )
 
     @staticmethod
     def display_pin_status(pin_number: int, power_status: int) -> None:
-        display.show("P{}".format(str(pin_number)))
-        display.show(StatusDisplay.status[power_status])
+        display.show([str(pin_number), StatusDisplay.status[power_status]] * 2, delay=800, clear=True)
         
+    @staticmethod
     def display_settings():
-        display.show(StatusDisplay.settings_image, delay=10000)
+        display.show(StatusDisplay.settings_image, delay=2500, clear=True)
