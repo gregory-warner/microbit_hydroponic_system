@@ -1,5 +1,5 @@
 from microbit_pin_controller import MicrobitPinController, Mode
-from microbit import *
+from microbit import button_a, button_b
 
 class MicrobitListener:
     def __init__(self, controller: MicrobitPinController):
@@ -12,13 +12,13 @@ class MicrobitListener:
         
         if self.controller.mode == Mode.SETTINGS and button_b.is_pressed():
             self.controller.update_interval_timer()
-        
 
     def on_pin_touch(self):
         if self.controller.mode == Mode.SETTINGS:
             for pin in self.controller.pins:
                 if pin.is_touched():
                     self.controller.set_pin_on(pin)
+                    self.controller.reset_timer()
                     break
             
     

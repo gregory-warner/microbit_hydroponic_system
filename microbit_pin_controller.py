@@ -46,11 +46,12 @@ class MicrobitPinController:
         self.toggle_pin_power()
         self.timer.reset()
 
+    def reset_timer(self) -> None:
+        self.timer.reset()
+        StatusDisplay.display_reset()
+
     def toggle_pin_power(self):
-        current_power = not int(self._pin.read_digital())
-        # self.power_status = (int(current_power) + 1) % 2
-        # display.show([str(current_power)], delay=800, clear=True)
-        # self.write_pin(self._pin, self.power_status)
+        self.write_pin(self._pin, not self.power_status)
 
     def write_pin(self, pin, status: int) -> None:
         self.power_status = status
