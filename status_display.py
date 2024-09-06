@@ -20,9 +20,10 @@ class StatusDisplay:
         
     @staticmethod
     def display_settings():
-        display.show(StatusDisplay.settings_image, delay=2500, clear=True)
+        display.show(StatusDisplay.settings_image, delay=1500, clear=True)
 
-    def display_reset():
+    @staticmethod
+    def display_start():
         display.show([
             Image(
                 "00000:"
