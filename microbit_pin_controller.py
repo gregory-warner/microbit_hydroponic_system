@@ -12,54 +12,49 @@ class Mode:
 
 class MicrobitPinController:
     def __init__(self):
-        self.timer = IntervalTimer()
-        self._pin = None
         self.pins = [pin0, pin1, pin2]
-        self.set_pin_on(self.pins[0])
+        self._pin = None
+        self.mode = Mode.POWER
+        self.power_status = Power.OFF
+        self.timer = IntervalTimer()
+
+    def _get_pin_index(self) -> int:
+        if self._pin is None:
+            return -1
+        return self.pins.index(self._pin)
+    
+    def set_pin(self, pin):
+        self._pin = pin
+        display.show(str(self._get_pin_index()), delay=200, clear=True)
+
+    def set_pin_power(self, pin, power_status: int):
+        self.power_status = power_status
+        pin.write_digital(power_status)
+
+    def reset_pins(self) -> None:
+        self.power_status = Power.OFF
+        for pin in self.pins:
+            self.set_pin_power(pin, self.power_status)
 
     def toggle_mode(self) -> None:
         self.mode = not self.mode
         if self.mode == Mode.SETTINGS:
+            self.reset_pins()
             StatusDisplay.display_settings()
-
-    def set_pin_on(self, pin) -> None:
-        if self._pin == pin or pin.read_digital() == Power.ON:
-            return
-        
-        self._pin = pin
-        self.mode = Mode.POWER
-        self.write_pin(self._pin, Power.ON)
+        elif self.mode == Mode.POWER:
+            StatusDisplay.display_start()
+            if self._pin is not None:
+                self.set_pin_power(self._pin, Power.ON)
+                self.timer.reset()
 
     def update_interval_timer(self):
-        self.timer.change_interval()
+        display.scroll(str(self.timer.change_interval()))
         self.timer.reset()
 
-    def check_interval_timer(self):
-        if self.timer.get_remaining_time() <= 0:
-            self.toggle_pin_power()
-            self.timer.reset()
-        
-    def is_timer_expired(self) -> bool:
-        return self.timer.get_remaining_time() <= 0
-    
     def timer_expired_handler(self) -> None:
-        self.toggle_pin_power()
-        self.timer.reset()
+        if self.timer.is_timer_expired():
+            power = int(not self.power_status)
+            self.set_pin_power(self._pin, power)
+            StatusDisplay.display_pin_status(self.pins.index(self._pin), power)
+            self.timer.reset()
 
-    def reset_timer(self) -> None:
-        self.timer.reset()
-        StatusDisplay.display_reset()
-
-    def toggle_pin_power(self):
-        self.write_pin(self._pin, not self.power_status)
-
-    def write_pin(self, pin, status: int) -> None:
-        self.power_status = status
-        pin_index = self.pins.index(pin)
-        self.pins[pin_index].write_digital(status)
-        StatusDisplay.display_pin_status(pin_index, status)
-
-    def reset_pins(self):
-        for pin in self.pins:
-            if pin.read_digital() == Power.ON:
-                self.write_pin(pin, Power.OFF)
