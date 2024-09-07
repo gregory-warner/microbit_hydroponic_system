@@ -24,6 +24,9 @@ class IntervalTimer:
     def elapsed(self) -> int:
         return running_time() - self.start_time
     
+    def stop(self) -> None:
+        self.start_time = None
+    
     def is_timer_expired(self) -> bool:
         return self.start_time is not None and self.interval - self.elapsed() <= 0
 

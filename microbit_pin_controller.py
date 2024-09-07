@@ -40,6 +40,7 @@ class MicrobitPinController:
         self.mode = not self.mode
         if self.mode == Mode.SETTINGS:
             self.reset_pins()
+            self.timer.stop()
             StatusDisplay.display_settings()
         elif self.mode == Mode.POWER:
             StatusDisplay.display_start()
