@@ -1,6 +1,7 @@
 from microbit import *
 from status_display import StatusDisplay
 from interval_timer import IntervalTimer
+from collections import namedtuple
 
 class Power:
     OFF = 0
@@ -9,6 +10,8 @@ class Power:
 class Mode:
     SETTINGS = 0
     POWER = 1
+
+PinValue = namedtuple('PinValue', ['pin', 'value'])
 
 class MicrobitPinController:
     def __init__(self):
@@ -23,6 +26,16 @@ class MicrobitPinController:
             return -1
         return self.pins.index(self._pin)
     
+    def set_pin_to_minimum_value(self):
+        pin_analog_value = PinValue(pin=self._pin, value=float('inf'))
+
+        for pin in self.pins:
+            if pin.is_touched():
+                value = pin.read_analog()
+                if value < pin_analog_value.value:
+                    pin_analog_value = PinValue(pin=pin, value=value)
+        self.set_pin(pin_analog_value.pin)
+
     def set_pin(self, pin):
         self._pin = pin
         display.show(str(self._get_pin_index()), delay=200, clear=True)
@@ -50,7 +63,6 @@ class MicrobitPinController:
 
     def update_interval_timer(self):
         display.scroll(str(self.timer.change_interval()))
-        self.timer.reset()
 
     def timer_expired_handler(self) -> None:
         if self.timer.is_timer_expired():

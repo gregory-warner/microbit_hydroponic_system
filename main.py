@@ -9,10 +9,7 @@ def main():
             pc.toggle_mode()
         if pc.mode == Mode.SETTINGS:
             if button_a.is_pressed():
-                for pin in pc.pins:
-                    if pin.is_touched():
-                        pc.set_pin(pin)
-                        break
+                pc.set_pin_to_minimum_value()
                 continue
             if button_b.is_pressed():
                 pc.update_interval_timer()
