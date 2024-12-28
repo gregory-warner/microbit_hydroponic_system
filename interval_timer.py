@@ -2,21 +2,27 @@ from microbit import running_time
 
 millis_in_second = 1000
 seconds_in_minute = 60
-minute_in_hour = 60
 
 class IntervalTimer:
     def __init__(self):
         self.start_time = None
-        # intervals in hours
-        self.intervals = [1, 2, 4, 8, 16, 24]
-        self.current_interval_index = 0
-        self.interval = self._hours_to_millis(self.intervals[self.current_interval_index])
+        # intervals in minutes
+        self.intervals = [1, 60, 120, 240, 480, 960, 1920]
 
-    def _hours_to_millis(self, hour) -> int:
-        return hour * minute_in_hour * seconds_in_minute * millis_in_second
+        # default to 4 hours off
+        self.current_interval_index = 3
+
+        # pump will stay on for the duration in minutes
+        self.power_on_duration = 30
+
+        self.interval = self.intervals[self.current_interval_index]
+        self.interval = self._minutes_to_millis(self.intervals[self.current_interval_index])
     
-    def _millis_to_hours(self, millis) -> int:
-        return millis // (millis_in_second * seconds_in_minute * minute_in_hour)
+    def _minutes_to_millis(self, minutes) -> int:
+        return minutes * seconds_in_minute * millis_in_second
+
+    def _millis_to_minutes(self, millis) -> int:
+        return millis // (millis_in_second * seconds_in_minute)
 
     def reset(self):
         self.start_time = running_time()
@@ -32,5 +38,12 @@ class IntervalTimer:
 
     def change_interval(self) -> int:
         self.current_interval_index = (self.current_interval_index + 1) % len(self.intervals)
-        self.interval = self._hours_to_millis(self.intervals[self.current_interval_index])
-        return self._millis_to_hours(self.interval)
+        self.interval = self._minutes_to_millis(self.intervals[self.current_interval_index])
+        return self._millis_to_minutes(self.interval)
+    
+    def update_pump_interval(self, power_status: int) -> int:
+        if power_status == 1:
+            self.interval = self._minutes_to_millis(self.power_on_duration)
+        else:
+            self.interval = self._minutes_to_millis(self.intervals[self.current_interval_index])
+        return self._millis_to_minutes(self.interval)
