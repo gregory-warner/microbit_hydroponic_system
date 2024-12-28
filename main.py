@@ -13,8 +13,9 @@ def main():
                 continue
             if button_b.is_pressed():
                 pc.update_interval_timer()
-                
-        pc.timer_expired_handler()
+        elif pc.run_count > 0:
+            pc.timer_expired_handler()
+            display.scroll(str(pc.run_count))
 
 if __name__ == "__main__":
     main()

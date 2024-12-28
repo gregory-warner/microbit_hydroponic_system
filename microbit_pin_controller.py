@@ -3,13 +3,13 @@ from status_display import StatusDisplay
 from interval_timer import IntervalTimer
 from collections import namedtuple
 
-class Power:
-    OFF = 0
-    ON = 1
-
 class Mode:
     SETTINGS = 0
     POWER = 1
+
+class Power:
+    OFF = 0
+    ON = 1
 
 PinValue = namedtuple('PinValue', ['pin', 'value'])
 
@@ -19,6 +19,7 @@ class MicrobitPinController:
         self._pin = None
         self.mode = Mode.POWER
         self.power_status = Power.OFF
+        self.run_count = 0
         self.timer = IntervalTimer()
 
     def _get_pin_index(self) -> int:
@@ -58,8 +59,10 @@ class MicrobitPinController:
         elif self.mode == Mode.POWER:
             StatusDisplay.display_start()
             if self._pin is not None:
-                self.set_pin_power(self._pin, Power.ON)
-                self.timer.reset()
+                power_status = Power.ON
+                self.run_count = 1
+                self.set_pin_power(self._pin, power_status)
+                self.update_pump_interval(power_status)
 
     def update_interval_timer(self):
         display.scroll(str(self.timer.change_interval()))
@@ -68,6 +71,13 @@ class MicrobitPinController:
         if self.timer.is_timer_expired():
             power = int(not self.power_status)
             self.set_pin_power(self._pin, power)
+            if power == Power.ON:
+                self.run_count += 1
             StatusDisplay.display_pin_status(self.pins.index(self._pin), power)
-            self.timer.reset()
+            self.update_pump_interval(power)
+
+    def update_pump_interval(self, power_status: int) -> None:
+        interval_minutes = self.timer.update_pump_interval(power_status)
+        display.scroll(str(interval_minutes))
+        self.timer.reset()
 
