@@ -13,9 +13,8 @@ def main():
                 continue
             if button_b.is_pressed():
                 pc.update_interval_timer()
-        elif pc.run_count > 0:
-            pc.timer_expired_handler()
-            display.scroll(str(pc.run_count))
+        elif button_b.is_pressed():
+            pc.toggle_pump_power()
 
 if __name__ == "__main__":
     main()
