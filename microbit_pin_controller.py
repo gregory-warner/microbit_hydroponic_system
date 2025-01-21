@@ -69,15 +69,20 @@ class MicrobitPinController:
 
     def timer_expired_handler(self) -> None:
         if self.timer.is_timer_expired():
-            power = int(not self.power_status)
-            self.set_pin_power(self._pin, power)
-            if power == Power.ON:
-                self.run_count += 1
-            StatusDisplay.display_pin_status(self.pins.index(self._pin), power)
-            self.update_pump_interval(power)
+            self.toggle_pump_power()
 
     def update_pump_interval(self, power_status: int) -> None:
         interval_minutes = self.timer.update_pump_interval(power_status)
         display.scroll(str(interval_minutes))
         self.timer.reset()
 
+    def toggle_pump_power(self) -> None:
+        if self._pin is None:
+            return
+
+        power = int(not self.power_status)
+        self.set_pin_power(self._pin, power)
+        if power == Power.ON:
+            self.run_count += 1
+        StatusDisplay.display_pin_status(self.pins.index(self._pin), power)
+        self.update_pump_interval(power)
