@@ -15,6 +15,8 @@ def main():
                 pc.update_interval_timer()
         elif button_b.is_pressed():
             pc.toggle_pump_power()
+        else:
+            pc.timer_expired_handler()
 
 if __name__ == "__main__":
     main()
