@@ -1,8 +1,5 @@
 from microbit import running_time
 
-millis_in_second = 1000
-seconds_in_minute = 60
-
 class IntervalTimer:
     def __init__(self):
         self.start_time = None
@@ -19,10 +16,10 @@ class IntervalTimer:
         self.interval = self._minutes_to_millis(self.intervals[self.current_interval_index])
     
     def _minutes_to_millis(self, minutes) -> int:
-        return minutes * seconds_in_minute * millis_in_second
+        return minutes * 60 * 1000
 
     def _millis_to_minutes(self, millis) -> int:
-        return millis // (millis_in_second * seconds_in_minute)
+        return millis // (1000 * 60)
 
     def reset(self):
         self.start_time = running_time()
